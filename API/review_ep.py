@@ -26,16 +26,18 @@ def create_review(place_id):
     if user.id == place.host_id:
         abort(400, description="Host user cannot review their own place")
     review = Review(data["user_id"], place_id,
-                    data["rating"], data["comment"])
-    place.add_review(review)
-    user.add_review(review)
+                    data["comment"], data["rating"])
+    place.add_review(review.id)
+    user.add_review(review.id)
+    place.save(place_id, "Place", place)
+    user.save(user.id, "User", user)
     review.save(review.id, "Review", review)
     place.save(place.id, "Place", place)
     user.save(user.id, "User", user)
     return jsonify(review.to_dict()), 201
 
 
-@review_bp.route("/review/<review_id>", methods=["GET"])
+@review_bp.route("/reviews/<review_id>", methods=["GET"])
 def get_review(review_id):
     """Retrieve detailed information about a specific review"""
     review = Review.reload(review_id, "Review")
@@ -44,21 +46,21 @@ def get_review(review_id):
     return jsonify(review), 200
 
 
-@review_bp.route("/review/<review_id>", methods=["PUT"])
+@review_bp.route("/reviews/<review_id>", methods=["PUT"])
 def update_review(review_id):
     """Update an existing review"""
-    review = Review.get(review_id, "Place")
+    review = Review.get(review_id, "Review")
     if review is None:
         abort(404, description="Review not found")
-    comment = request.json["comment"]
-    rating = request.json["rating"]
-    review.comment = comment
-    review.rating = rating
-    review.update(review.id, "Review", review)
+    data = request.json
+    if data is None or not data:
+        abort(400, description="No data provided (must be JSON)")
+    review.comment = data["comment"]
+    review.rating = data["rating"]
+    review.save(review_id, "Review", review)
     return jsonify(review.to_dict()), 201
 
-
-@review_bp.route("/review/<review_id>", methods=["DELETE"])
+@review_bp.route("/reviews/<review_id>", methods=["DELETE"])
 def delete_review(review_id):
     """Delete a review"""
     review = Review.get(review_id, "Review")
@@ -76,7 +78,7 @@ def get_place_reviews(place_id):
         abort(404, description="Place not found")
     if place.reviews is None:
         abort(404, description="Place has no reviews")
-    place_reviews = [review.to_dict() for review in place.reviews]
+    place_reviews = [review for review in place.reviews]
     return jsonify(place_reviews), 200
 
 
@@ -88,5 +90,5 @@ def get_user_reviews(user_id):
         abort(404, description="User not found")
     if user.reviews is None:
         abort(404, description="User has no reviews")
-    user_reviews = [review.to_dict() for review in user.reviews]
+    user_reviews = [review for review in user.reviews]
     return jsonify(user_reviews), 200

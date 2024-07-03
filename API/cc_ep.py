@@ -28,8 +28,10 @@ def get_cities_in_country(country_code):
     country = Country.get(country_code)
     if not country:
         abort(404, description="Country not found")
-    cities = [city.to_dict() for city in City.all()
-              if city.country_code == country_code]
+    cities = [city for city in City.all("City")
+              if city["country_code"] == country_code]
+    if not cities:
+        abort(404, description="Cities not found")
     return jsonify(cities), 200
 
 

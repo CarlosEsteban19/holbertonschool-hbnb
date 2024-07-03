@@ -5,6 +5,7 @@ from Persistence.data_manager import DataManager
 
 class Review(DataManager):
     """class that defines a review"""
+
     def __init__(self, user_id: str, place_id, comment: str, rating: int):
         """initialize a review"""
         self.__id = str(uuid.uuid4())
@@ -52,6 +53,7 @@ class Review(DataManager):
             raise TypeError("comment must be a valid string")
         if not comment or len(comment.strip()) == 0:
             raise ValueError("comment cannot be empty")
+        self.__comment = comment
         self.__updated_at = datetime.now().strftime("%B/%d/%Y %I:%M:%S %p")
 
     @property
@@ -66,6 +68,7 @@ class Review(DataManager):
             raise TypeError("rating must be an integer")
         if rating < 1 or rating > 5:
             raise ValueError("rating must be between 1 and 5")
+        self.__rating = rating
         self.__updated_at = datetime.now().strftime("%B/%d/%Y %I:%M:%S %p")
 
     def to_dict(self):
@@ -81,17 +84,17 @@ class Review(DataManager):
         }
 
 
-@classmethod
-def from_dict(cls, data):
-    """Create a Review object from a dictionary."""
-    review = cls(
-        user_id=data['user_id'],
-        place_id=data['place_id'],
-        comment=data['comment'],
-        rating=int(data['rating'])
-    )
-    review.__id = data['id']
-    review.__created_at = data['created_at']
-    review.__updated_at = data['updated_at']
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Review object from a dictionary."""
+        review = cls(
+            user_id=data['user_id'],
+            place_id=data['place_id'],
+            comment=data['comment'],
+            rating=data['rating']
+        )
+        review.__id = data['id']
+        review.__created_at = data['created_at']
+        review.__updated_at = data['updated_at']
 
-    return review
+        return review

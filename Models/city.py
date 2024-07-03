@@ -66,15 +66,15 @@ class City(DataManager):
         }
 
 
-@classmethod
-def from_dict(cls, data):
-    """Create a City object from a dictionary."""
-    city = cls(
-        name=data['name'],
-        country_code=data['country_code']
-    )
-    city.__id = data['id']
-    city.__created_at = data['created_at']
-    city.__updated_at = data['updated_at']
+    @classmethod
+    def from_dict(cls, data):
+        """Create a City object from a dictionary."""
+        city = cls(
+            name=data['name'],
+            country_code=data['country_code']
+        )
+        city.__id = data['id']
+        city.__created_at = data['created_at']
+        city.__updated_at = data['updated_at']
 
-    return city
+        return city

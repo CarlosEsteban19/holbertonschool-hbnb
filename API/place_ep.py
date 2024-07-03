@@ -31,7 +31,8 @@ def create_place():
             place.add_amenity(amenity)
         except ValueError:
             abort(404, description="Amenity not found")
-    user.add_place(place)
+    user.add_place(place.id)
+    user.save(user.id, "User", user)
     place.save(place.id, "Place", place)
     user.save(user.id, "User", user)
     return jsonify(place.to_dict()), 201
@@ -50,7 +51,7 @@ def get_places():
 @place_bp.route("/places/<place_id>", methods=["GET"])
 def get_place(place_id):
     """Retrieve detailed information about a specific place"""
-    place = Place.reload(place_id, "place")
+    place = Place.reload(place_id, "Place")
     if place is None:
         abort(404, description="Place not found")
     return jsonify(place), 200
@@ -70,10 +71,10 @@ def update_place(place_id):
         if user is None:
             abort(404, description="User not found")
         prev_host = User.get(place.host_id, "User")
-        if prev_host is not None:
-            prev_host.places.remove(place)
+        if prev_host is not None and prev_host != user:
+            prev_host.places.remove(place_id)
         place.host_id = data["host_id"]
-        user.add_place(place)
+        user.add_place(place_id)
     if "amenities" in data:
         place.amenities.clear()
         place.add_amenity(amenity for amenity in data["amenities"])
@@ -107,7 +108,8 @@ def delete_place(place_id):
     place = Place.get(place_id, "Place")
     if place is None:
         abort(404, description="Place not found")
-    host = User.get(place.host_id, "User")
-    host.places.remove(place)
-    place.delete(place.id, "Place")
+    host = Place.get(place.host_id, "User")
+    # print(host.places)
+    # host.places.remove(place_id)
+    place.delete(place_id, "Place")
     return "Place deleted", 204

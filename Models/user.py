@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
-from .place import Place
-from .review import Review
+from Models.place import Place
+from Models.review import Review
 from Persistence.data_manager import DataManager
 
 
@@ -12,8 +12,8 @@ class User(DataManager):
     def __init__(self, first_name: str, last_name: str,
                  email: str, password: str):
         """initialize a user"""
-        if email in User.emails:  # handle unique email
-            raise ValueError("Email already exists")
+        # if email in User.emails:  # handle unique email
+            # raise ValueError("Email already exists")
         User.emails.append(email)
         self.__email = email
         self.__id = str(uuid.uuid4())
@@ -27,16 +27,16 @@ class User(DataManager):
 
     def add_place(self, place):
         """Add place to list of user places"""
-        if not isinstance(place, Place):
-            raise ValueError("place must be a Place instance")
-        self.places.append(place.id)
+        #if not isinstance(place, Place):
+        #    raise ValueError("place must be a Place instance")
+        self.places.append(place)
         self.__updated_at = datetime.now().strftime("%B/%d/%Y %I:%M:%S %p")
 
     def add_review(self, review):
         """Add review to list of user reviews"""
-        if not isinstance(review, Review):
-            raise ValueError("review must be a Review instance")
-        self.reviews.append(review.id)
+        #if not isinstance(review, Review):
+        #    raise ValueError("review must be a Review instance")
+        self.reviews.append(review)
         self.__updated_at = datetime.now().strftime("%B/%d/%Y %I:%M:%S %p")
 
     @property
@@ -127,25 +127,21 @@ class User(DataManager):
             "places": [place for place in self.places],
             "reviews": [review for review in self.reviews],
         }
+    @classmethod
+    def from_dict(cls, data):
+        """Create a User object from a dictionary."""
+        user = cls(
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            email=data['email'],
+            password=data['password']
+        )
+        user.__id = data['id']
+        user.__created_at = data['created_at']
+        user.__updated_at = data['updated_at']
 
+        user.places = [place_data for place_data in data.get('places', [])]
 
-@classmethod
-def from_dict(cls, data):
-    """Create a User object from a dictionary."""
-    user = cls(
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        email=data['email'],
-        password=data['password']
-    )
-    user.__id = data['id']
-    user.__created_at = data['created_at']
-    user.__updated_at = data['updated_at']
+        user.reviews = [review_data for review_data in data.get('reviews', [])]
 
-    user.places = [Place.from_dict(place_data)
-                   for place_data in data.get('places', [])]
-
-    user.reviews = [Review.from_dict(review_data)
-                    for review_data in data.get('reviews', [])]
-
-    return user
+        return user

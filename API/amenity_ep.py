@@ -12,6 +12,8 @@ def create_ammenity():
         abort(400, description="No data provided (must be JSON)")
     if "name" not in data:
         abort(400, description="Missing name")
+    if data["name"] in Amenity.amenities:
+        abort(400, description="Amenity already exists")
     amenity = Amenity(data["name"])
     amenity.save(amenity.id, "Amenity", amenity)
     return jsonify(amenity.to_dict()), 201
