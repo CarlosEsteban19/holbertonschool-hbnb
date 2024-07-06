@@ -60,6 +60,7 @@ def update_review(review_id):
     review.save(review_id, "Review", review)
     return jsonify(review.to_dict()), 201
 
+
 @review_bp.route("/reviews/<review_id>", methods=["DELETE"])
 def delete_review(review_id):
     """Delete a review"""

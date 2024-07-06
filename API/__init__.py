@@ -5,6 +5,7 @@ from .review_ep import review_bp
 from .cc_ep import cc_bp
 from .amenity_ep import amenity_bp
 
+
 def create_app():
     app = Flask("HBnB")
 
