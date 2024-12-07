@@ -6,10 +6,10 @@ DATA_FILE = "data.json"
 
 def load_storage():
     """Load data from data.json file as dict"""
-    
+
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
-            #handle empty data.json
+            # handle empty data.json
             loaded_data = json.load(f)
             storage = {
                 "User": {},
@@ -31,37 +31,35 @@ def load_storage():
         "Country": {},
         "Amenity": {}
         }
-    
-    
+
+
 def load_objects():
     """Load data from data.json as objects"""
     objects = {}
     if os.path.exists(DATA_FILE):
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                loaded_data = json.load(f)
-                for data_type, items in loaded_data.items():
-                    for item, obj_data in items.items():
-                        if data_type == "User":
-                            from Models.user import User
-                            obj = User.from_dict(obj_data)
-                        elif data_type == "Place":
-                            from Models.place import Place
-                            obj = Place.from_dict(obj_data)
-                        elif data_type == "Review":
-                            from Models.review import Review
-                            obj = Review.from_dict(obj_data)
-                        elif data_type == "City":
-                            from Models.city import City
-                            obj = City.from_dict(obj_data)
-                        elif data_type == "Amenity":
-                            from Models.amenity import Amenity
-                            obj = Amenity.from_dict(obj_data)
-                            
-                        objects[item] = obj
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            loaded_data = json.load(f)
+            for data_type, items in loaded_data.items():
+                for item, obj_data in items.items():
+                    if data_type == "User":
+                        from Models.user import User
+                        obj = User.from_dict(obj_data)
+                    elif data_type == "Place":
+                        from Models.place import Place
+                        obj = Place.from_dict(obj_data)
+                    elif data_type == "Review":
+                        from Models.review import Review
+                        obj = Review.from_dict(obj_data)
+                    elif data_type == "City":
+                        from Models.city import City
+                        obj = City.from_dict(obj_data)
+                    elif data_type == "Amenity":
+                        from Models.amenity import Amenity
+                        obj = Amenity.from_dict(obj_data)
+
+                    objects[item] = obj
 
     return objects
-    
-    
 
 
 def save_data(data):
@@ -134,7 +132,7 @@ class DataManager():
     @classmethod
     def all(cls, data_type):
         """Retrieve all Data of given Data type"""
-        
+
         storage = load_storage()
         if data_type not in storage:
             raise ValueError(f"Unsupported data type: {data_type}")

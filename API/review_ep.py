@@ -32,6 +32,8 @@ def create_review(place_id):
     place.save(place_id, "Place", place)
     user.save(user.id, "User", user)
     review.save(review.id, "Review", review)
+    place.save(place.id, "Place", place)
+    user.save(user.id, "User", user)
     return jsonify(review.to_dict()), 201
 
 
@@ -57,6 +59,7 @@ def update_review(review_id):
     review.rating = data["rating"]
     review.save(review_id, "Review", review)
     return jsonify(review.to_dict()), 201
+
 
 @review_bp.route("/reviews/<review_id>", methods=["DELETE"])
 def delete_review(review_id):

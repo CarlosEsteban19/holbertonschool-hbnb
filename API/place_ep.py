@@ -34,6 +34,7 @@ def create_place():
     user.add_place(place.id)
     user.save(user.id, "User", user)
     place.save(place.id, "Place", place)
+    user.save(user.id, "User", user)
     return jsonify(place.to_dict()), 201
 
 
@@ -107,8 +108,5 @@ def delete_place(place_id):
     place = Place.get(place_id, "Place")
     if place is None:
         abort(404, description="Place not found")
-    host = Place.get(place.host_id, "User")
-    # print(host.places)
-    # host.places.remove(place_id)
     place.delete(place_id, "Place")
     return "Place deleted", 204

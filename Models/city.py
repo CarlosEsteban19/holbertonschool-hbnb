@@ -1,10 +1,21 @@
 import uuid
 from datetime import datetime
 from Persistence.data_manager import DataManager
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
 
 class City(DataManager):
     """class that defines a city"""
+    __tablename__ = 'cities'
+
+    id = db.Column(db.String(36), primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    country_code = db.Column(
+        db.String(3), db.ForeignKey('countries.code'), nullable=False)
+    country = db.relationship('Country', back_populates='cities')
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
 
     def __init__(self, name: str, country_code):
         """initialize a city"""
@@ -13,47 +24,6 @@ class City(DataManager):
         self.__updated_at = self.__created_at
         self.__name = name
         self.__country_code = country_code
-
-    @property
-    def id(self):
-        """id getter"""
-        return self.__id
-
-    @property
-    def created_at(self):
-        """creation datetime getter"""
-        return self.__created_at
-
-    @property
-    def updated_at(self):
-        """last update datetime getter"""
-        return self.__updated_at
-
-    @property
-    def name(self):
-        """name getter"""
-        return self.__name
-
-    @name.setter
-    def name(self, name):
-        """name setter"""
-        if type(name) is not str:
-            raise TypeError("name must be a text string")
-        if not name or len(name.strip()) == 0:
-            raise ValueError("name cannot be empty")
-        self.__name = name
-        self.__updated_at = datetime.now().strftime("%B/%d/%Y %I:%M:%S %p")
-
-    @property
-    def country_code(self):
-        """country getter"""
-        return self.__country_code
-
-    @country_code.setter
-    def country_code(self, country_code):
-        """country setter"""
-        self.__country_code = country_code
-        self.__updated_at = datetime.now().strftime("%B/%d/%Y %I:%M:%S %p")
 
     def to_dict(self):
         """Return a dictionary representation of a city"""
@@ -64,7 +34,6 @@ class City(DataManager):
             "name": self.__name,
             "country_code": self.__country_code
         }
-
 
     @classmethod
     def from_dict(cls, data):
